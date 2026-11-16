@@ -1,0 +1,16 @@
+node_modules
+.next
+.next-*
+studio-package
+.git
+.gitignore
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
+*.log
+coverage
+docs
+*.md
+!README.md
+scripts/audit-data.cjs.bak

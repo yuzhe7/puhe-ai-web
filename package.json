@@ -1,0 +1,46 @@
+{
+  "name": "puhe-ai-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "谱合产教 · AI Native 产教融合智能诊断平台（第九届传智杯 AI WEB 网页开发挑战赛）",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "check:modelscope": "node scripts/check-modelscope.mjs",
+    "audit:data": "node scripts/audit-data.cjs",
+    "pack:studio": "node scripts/pack-studio.mjs",
+    "verify:studio": "node scripts/verify-studio.mjs",
+    "verify:ocr": "node scripts/verify-ocr.mjs",
+    "verify:majors": "node scripts/verify-majors.mjs",
+    "verify:links": "node scripts/verify-deeplinks.mjs",
+    "verify:oss": "node scripts/check-oss-risk.mjs"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "echarts": "^5.5.1",
+    "lucide-react": "^0.468.0",
+    "mammoth": "^1.9.0",
+    "next": "14.2.33",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "unpdf": "^0.12.1",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.10",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.33",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.16",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  }
+}
