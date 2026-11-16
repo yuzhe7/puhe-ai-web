@@ -25,6 +25,7 @@ export function clearGraphCaches() {
   alignCache.clear();
   topologyCache.clear();
   majorKpCache.clear();
+  domainTextCache.clear();
   similarityCache = null;
 }
 
@@ -177,7 +178,7 @@ const ALIGN_RULES: [RegExp, RegExp, number][] = [
   [/软件测试|持续集成|版本控制/, /自动化测试|CI|Git|DevOps|测试开发/, 0.88],
   [/数据清洗|SQL|索引/, /ETL|数据|SQL|数据库/, 0.85],
   [/前端框架|HTML|REST/, /React|Vue|组件化|接口|API/, 0.86],
-  [/BIM|GIS|无人机|空间/, /BIM|GIS|航测|数字孪生|空间/, 0.9],
+  [/BIM|GIS|无人机|空间信息|空间分析|地理空间|时空/, /BIM|GIS|航测|数字孪生|空间信息|空间分析|地理空间|时空/, 0.9],
   // 芯片 / 半导体
   [/半导体|MOS|光刻|Verilog|EDA|时序|载流子/, /芯片|IC设计|EDA|半导体|封测|RTL/, 0.92],
   // 网络空间安全
@@ -188,8 +189,9 @@ const ALIGN_RULES: [RegExp, RegExp, number][] = [
   [/飞控|姿态|航迹|路径规划|空域|遥感|GNSS|时空索引/, /无人机|飞控|低空|遥感|北斗|时空/, 0.9],
   // 医疗健康
   [/医学影像|生理信号|电子病历|医疗器械|临床|护理|口腔/, /医学影像AI|临床数据|健康大数据|医疗器械|辅助诊断/, 0.9],
-  // 数字经济 / 金融科技
-  [/智能风控|支付清算|量化|数据治理|数据确权|用户增长|财务报表/, /金融科技|数据资产|AIGC|数字营销|风控/, 0.88],
+  // 数字经济 / 金融科技（拆成两组，避免「数据治理」串到「AIGC / 数字营销」拿满分）
+  [/智能风控|支付清算|量化|财务报表/, /金融科技|风控|量化|投研/, 0.88],
+  [/数据治理|数据确权|数据估值/, /数据资产|数据治理/, 0.86],
   // 智能制造
   [/机器人运动学|示教|MES|柔性产线|工业数据采集|数字孪生|机器视觉/, /工业机器人|机器视觉|数字孪生|智能制造|SCADA/, 0.9],
   // 工业软件 / 仿真
@@ -205,19 +207,89 @@ const ALIGN_RULES: [RegExp, RegExp, number][] = [
   [/知识产权法|合同法|民法/, /法律合规|知识产权/, 0.86],
 ];
 
+/**
+ * 泛化词：单独出现不构成语义证据，也不允许作为「别名包含」的判定依据。
+ * 修复前任何「别名 ⊆ 技能名」都直接给 0.94，导致
+ * 「合同法」的别名「合规」命中「数据合规与隐私保护」=0.94、
+ * 「Numpy与Pandas」的别名「数据处理」命中「临床数据处理」=0.94 —— 匹配排序被通用词污染。
+ */
+const GENERIC_ALIGN_TERMS = new Set([
+  '数据', '分析', '处理', '数据处理', '管理', '技术', '系统', '工程', '能力', '基础',
+  '方法', '应用', '开发', '设计', '优化', '治理', '合规', '智能', '服务', '平台',
+  '工具', '流程', '模型', '算法', '网络', '安全', '信息', '计算', '软件', '硬件',
+  '测试', '运维', '产品', '运营', '营销', '沟通', '文档', '规范', '项目', '团队', '学习',
+]);
+
+/**
+ * 别名包含判定（替代原先的硬编码 0.94）：
+ * 要求别名足够具体（中文 ≥3 字且非泛化词），并按「覆盖技能名的比例」线性给分，
+ * 覆盖率越低说明只是技能名里的一小段通用词，不应获得高分。
+ */
+function containmentScore(alias: string, skillName: string): number {
+  const a = alias.trim();
+  const s = skillName.trim();
+  if (!a || !s) return 0;
+  const latin = /^[\x20-\x7e]+$/.test(a);
+  if (latin ? a.length < 2 : a.length < 3) return 0;
+  if (!latin && GENERIC_ALIGN_TERMS.has(a)) return 0;
+  const hit = s.includes(a) ? a : (a.includes(s) ? s : '');
+  if (!hit) return 0;
+  const cover = hit.length / Math.max(a.length, s.length);
+  if (cover < 0.5) return 0;
+  return +(0.5 + 0.44 * cover).toFixed(3);
+}
+
+/**
+ * 规则命中词提取：原来用 `ra.test(haystack) && rb.test(skillName)` 做「两侧任一词命中即给满分」，
+ * 导致规则 [/数据清洗|SQL|索引/, /ETL|数据|SQL|数据库/] 只要技能名里出现「数据」就拿到 0.85，
+ * 「临床数据处理」「健康大数据分析」等医疗技能因此全部贴到「树与二叉树 / 数据清洗」上。
+ * 现在两侧都必须命中「非泛化、≥2 字」的具体词，且按命中词长度折算具体性。
+ */
+const globalRuleCache = new Map<RegExp, RegExp>();
+
+function ruleMatches(re: RegExp, text: string): string[] {
+  let g = globalRuleCache.get(re);
+  if (!g) {
+    g = new RegExp(re.source, 'g');
+    globalRuleCache.set(re, g);
+  }
+  g.lastIndex = 0;
+  const out: string[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = g.exec(text)) !== null) {
+    if (m[0].length >= 2 && !GENERIC_ALIGN_TERMS.has(m[0])) out.push(m[0]);
+    if (g.lastIndex === m.index) g.lastIndex += 1; // 防御零宽匹配死循环
+    if (out.length > 8) break;
+  }
+  return out;
+}
+
 export function alignScore(kpName: string, aliases: string[], skillName: string): number {
   const key = `${kpName}\u0001${aliases.join('\u0002')}\u0001${skillName}`;
   const cached = alignCache.get(key);
   if (cached !== undefined) return cached;
 
+  // 同名 / 同义名为强证据：原实现只走 charCosine × 0.6，完全同名也只有 0.6，
+  // 导致「继电保护整定」这类精确对齐反而输给靠规则蹭分的跨域岗位。
+  if (kpName === skillName || aliases.includes(skillName)) {
+    alignCache.set(key, 1);
+    return 1;
+  }
+
   let best = charCosine(kpName, skillName) * 0.6;
   aliases.forEach((alias) => {
     best = Math.max(best, charCosine(alias, skillName) * 0.95);
-    if (skillName.includes(alias) || alias.includes(skillName)) best = Math.max(best, 0.94);
+    best = Math.max(best, containmentScore(alias, skillName));
   });
   const haystack = kpName + aliases.join('');
   ALIGN_RULES.forEach(([ra, rb, score]) => {
-    if (ra.test(haystack) && rb.test(skillName)) best = Math.max(best, score);
+    const left = ruleMatches(ra, haystack);
+    if (!left.length) return;
+    const right = ruleMatches(rb, skillName);
+    if (!right.length) return;
+    const longest = Math.max(...left.map((t) => t.length)) + Math.max(...right.map((t) => t.length));
+    const specificity = Math.min(1, longest / 8);
+    best = Math.max(best, score * (0.85 + 0.15 * specificity));
   });
   const result = +best.toFixed(3);
   if (alignCache.size >= CACHE_LIMIT) alignCache.clear();
@@ -225,9 +297,15 @@ export function alignScore(kpName: string, aliases: string[], skillName: string)
   return result;
 }
 
-export function knowledgeGaps(courseName: string): GapItem[] {
+/**
+ * 知识点缺口。
+ * @param opts.hours 课程总学时覆盖值（沙盘改革后学时）。传入时按比例缩放各知识点学时，
+ *   使「改学时 → 覆盖度 → 缺口判定」形成闭环；不传则按课程登记学时计算（与历史行为一致）。
+ */
+export function knowledgeGaps(courseName: string, opts?: { hours?: number }): GapItem[] {
   const course = courses.find((c) => c.name === courseName);
   if (!course) return [];
+  const ratio = opts?.hours && course.hours > 0 ? Math.max(0, opts.hours) / course.hours : 1;
   const skillVec = skills.map((s) => ({ name: s.name, demand: s.demand, aliases: s.aliases }));
   const items: GapItem[] = course.knowledgePoints.flatMap((name) => {
     // 防御：课程引用了未登记的孤立知识点时不抛异常，直接跳过并在诊断结果中缺失
@@ -241,22 +319,28 @@ export function knowledgeGaps(courseName: string): GapItem[] {
     const demand = matches.length
       ? Math.round(matches.reduce((acc, s) => acc + s.demand * s.sim, 0) / matches.reduce((acc, s) => acc + s.sim, 0))
       : kp.industryDemand;
-    const coverage = clamp(kp.hours / 10);
+    // 改革后学时按比例摊到各知识点，覆盖率随课时变化
+    const kpHours = Math.max(1, Math.round(kp.hours * ratio));
+    const coverage = clamp(kpHours / 10);
     let label: GapItem['label'];
     let reason: string;
     if (demand >= 75 && coverage < 0.65) {
-      label = '应加强'; reason = `产业需求强度 ${demand}，当前仅 ${kp.hours} 学时，建议增加课时并引入产业案例/实践环节`;
+      label = '应加强'; reason = `产业需求强度 ${demand}，当前仅 ${kpHours} 学时，建议增加课时并引入产业案例/实践环节`;
     } else if (demand >= 75 && coverage >= 0.65 && kp.trend === 'up') {
       label = '应加强'; reason = `产业需求强度 ${demand} 且处于上升趋势，建议升级教学内容至工程化用法`;
     } else if (demand <= 38) {
-      label = '可精简'; reason = `产业需求强度仅 ${demand}（${kp.trend === 'down' ? '衰退技能' : '低频'}），建议压缩 ${Math.max(2, Math.round(kp.hours * 0.3))} 学时`;
+      label = '可精简'; reason = `产业需求强度仅 ${demand}（${kp.trend === 'down' ? '衰退技能' : '低频'}），建议压缩 ${Math.max(2, Math.round(kpHours * 0.3))} 学时`;
     } else {
-      label = '保持'; reason = `产业需求 ${demand}，教学覆盖 ${kp.hours} 学时，供需基本平衡`;
+      label = '保持'; reason = `产业需求 ${demand}，教学覆盖 ${kpHours} 学时，供需基本平衡`;
     }
     return [{
-      name, course: courseName, hours: kp.hours, demand,
+      name, course: courseName, hours: kpHours, demand,
       coverage: +coverage.toFixed(2), label, reason,
-      evidence: matches.map((m) => `${m.name}（对齐度 ${m.sim}）`),
+      // 收紧对齐算法后，部分知识点确实找不到 ≥0.32 的高置信技能，此时如实说明推算依据，
+      // 而不是留一条空证据让界面显示「—」。
+      evidence: matches.length
+        ? matches.map((m) => `${m.name}（对齐度 ${m.sim}）`)
+        : [`无高置信度技能对齐，按知识点登记的需求强度 ${kp.industryDemand} 推算`],
     }];
   });
   // 应新增：产业侧高频技能，且与本课程领域相关，但课程知识体系未覆盖
@@ -423,16 +507,77 @@ export function buildGraph(layer: Layer, sides: Side[] = ['supply', 'demand'], f
   return { nodes: Array.from(nodeMap.values()), links, categories };
 }
 
-/** 专业—岗位跨侧匹配度：以知识点/技能对齐分数的加权平均近似 */
+/* ------------------------------------------------- 跨侧领域闸门（岗位匹配纠偏） */
+
+/**
+ * 产业域标记词：出现在岗位标题 / JD / 技能里，代表该岗位带有明确的领域语义。
+ * 只在「专业侧完全找不到该领域任何标记」时降权，不用它做正向加分，
+ * 因此纯技术岗（前端 / 后端 / 数据分析）不受影响。
+ */
+const DOMAIN_MARKERS: Record<string, string[]> = {
+  医疗健康: ['临床', '医学', '医疗', '影像', '病历', '护理', '口腔', '生理', '诊断', '药剂'],
+  数字法治: ['法学', '法律', '法务', '合规', '知识产权', '专利', '合同', '诉讼', '司法', '取证', '仲裁'],
+  智能建造: ['BIM', '建造', '施工', '土木', '水利', '水文', '测绘', '装配式', '工程造价'],
+  芯片半导体: ['半导体', '芯片', '集成电路', '光刻', 'EDA', '封测', 'RTL', '流片'],
+  新能源双碳: ['储能', '光伏', '风电', '电池', '氢能', '碳中和', '碳核算', 'BMS', '电网'],
+  智能制造: ['机器人', '产线', '数控', '示教', 'PLC', 'MES', '工业软件', '数字孪生'],
+  教育: ['教学', '导学', '学前', '教育', '学习分析', '课标'],
+  传媒内容: ['传播', '舆情', '内容生产', '剪辑', '文案', '新媒体', '广告'],
+  金融: ['金融', '风控', '支付', '量化', '投研', '保险', '证券'],
+  交通低空: ['无人机', '飞控', '空域', '自动驾驶', '导航定位', '轨道'],
+  材料化工: ['材料', '化工', '合成', '表征', '催化', '分子模拟'],
+};
+
+/** 专业侧领域词袋：专业名 + 专业类 + 学院 + 课程 + 知识点及其产业别名 */
+const domainTextCache = new Map<string, string>();
+
+function majorDomainText(m: Major): string {
+  const cached = domainTextCache.get(m.id);
+  if (cached !== undefined) return cached;
+  const text = [
+    m.name, m.category, m.college,
+    ...m.courses,
+    ...kpsOfMajor(m).flatMap((k) => [k.name, ...k.aliases]),
+  ].join('|');
+  domainTextCache.set(m.id, text);
+  return text;
+}
+
+/**
+ * 领域亲和度：岗位带 A 领域标记而专业侧完全没有 A 领域词汇 → 跨域错配，降权；
+ * 命中 ≥1 个领域且无未命中项 → 1.0；部分命中（跨界但沾边）→ 0.86。
+ * 修复前 62 个专业里有 50 个的最高契合岗位集中落到 2 个岗位（临床数据分析师 / 智能建造工程师），
+ * 根因就是只做字面相似、不看领域。
+ */
+export function domainAffinity(m: Major, j: Job): number {
+  const majorText = majorDomainText(m);
+  const jobText = `${j.title}|${j.jd}|${j.skills.join('|')}`;
+  let hit = 0;
+  let miss = 0;
+  Object.values(DOMAIN_MARKERS).forEach((markers) => {
+    if (!markers.some((x) => jobText.includes(x))) return;
+    if (markers.some((x) => majorText.includes(x))) hit += 1;
+    else miss += 1;
+  });
+  if (!miss) return 1;
+  return hit ? 0.86 : 0.72;
+}
+
+/** 专业—岗位跨侧匹配度：知识点/技能对齐加权平均 × 领域亲和度 */
 export function crossSideMatch(m: Major, j: Job): number {
   if (!j) return 0;
   const kps = kpsOfMajor(m);
   if (!kps.length) return 0;
+  const resolved = j.skills
+    .map((sn) => skills.find((x) => x.name === sn))
+    .filter((s): s is (typeof skills)[number] => Boolean(s));
+  if (!resolved.length) return 0;
   let total = 0;
-  j.skills.forEach((sn) => {
-    const s = skills.find((x) => x.name === sn);
-    if (!s) return;
+  resolved.forEach((s) => {
     total += Math.max(...kps.map((k) => alignScore(k.name, k.aliases, s.name))) * (s.demand / 100);
   });
-  return clamp(total / Math.max(1, j.skills.length));
+  // 分母保持「岗位全部技能数」：语义是「该岗位要求的技能里，课程能覆盖几成」，
+  // 软技能（跨团队沟通等）确实无法由课程完全证明，保留在分母里更贴近真实覆盖率，
+  // 也更保守（避免把 0.4 的弱匹配抬成 0.7 的强匹配）。
+  return clamp((total / resolved.length) * domainAffinity(m, j));
 }

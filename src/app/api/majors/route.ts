@@ -74,11 +74,13 @@ function createSnapshot() {
       .map((n) => courseByName.get(n))
       .filter((c): c is (typeof courses)[number] => c !== undefined);
     const kpSet = new Set(owned.flatMap((c) => c.knowledgePoints));
-    const matched = jobs
+    const scored = jobs
       .map((j) => ({ title: j.title, industry: j.industry, score: +crossSideMatch(m, j).toFixed(2) }))
-      .filter((x) => x.score >= 0.3)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3);
+      .sort((a, b) => b.score - a.score);
+    // 领域闸门收紧后，个别交叉专业可能全部低于阈值：兜底保留最高分 1 个，
+    // 避免 /majors 卡片与深链接失去匹配岗位（否则渲染为空、断言也会失败）。
+    const matched = scored.filter((x) => x.score >= 0.3).slice(0, 3);
+    if (!matched.length && scored.length) matched.push(scored[0]);
     // 学科大类归类：精确映射 → 关键词规则 → 兜底，依据一并回传便于审计
     const cls = classifyMajor({
       name: m.name, code: m.code, college: m.college, category: m.category,
