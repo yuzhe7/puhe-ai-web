@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   Search, CornerDownLeft, Sparkles, LayoutDashboard, Network, ScanSearch, Bot,
   Database, FileText, SlidersHorizontal, Route, Microscope, GraduationCap,
-  BookOpen, BriefcaseBusiness, ArrowUp, ArrowDown, X, Command, PlugZap,
+  BookOpen, BriefcaseBusiness, ArrowUp, ArrowDown, X, Command, PlugZap, ShieldCheck,
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -18,7 +18,7 @@ interface Entities {
 
 const NAV_CMDS: Cmd[] = [
   { id: 'n1', label: '总览驾驶舱', hint: '平台全景与核心指标', group: '导航', href: '/', icon: <LayoutDashboard size={15} />, keywords: 'home overview 首页 总览' },
-  { id: 'n0', label: '热门专业目录', hint: '51 个专业 · 分类 / 来源 / 热度', group: '导航', href: '/majors', icon: <BookOpen size={15} />, keywords: 'majors 专业 目录 绿牌 新增 热度' },
+  { id: 'n0', label: '热门专业目录', hint: '62 个专业 · 分类 / 来源 / 热度', group: '导航', href: '/majors', icon: <BookOpen size={15} />, keywords: 'majors 专业 目录 绿牌 新增 热度' },
   { id: 'n2', label: '双侧三层图谱', hint: '交互式知识图谱浏览器', group: '导航', href: '/graph', icon: <Network size={15} />, keywords: 'graph 图谱 节点 关系' },
   { id: 'n3', label: '三维诊断工作台', hint: '宏观 / 中观 / 微观', group: '导航', href: '/diagnosis', icon: <ScanSearch size={15} />, keywords: 'diagnosis 诊断 同质化 偏差 缺口' },
   { id: 'n4', label: 'AI 诊断 Copilot', hint: '多 Agent 流式对话', group: '导航', href: '/copilot', icon: <Bot size={15} />, keywords: 'chat agent copilot 问答' },
@@ -27,6 +27,7 @@ const NAV_CMDS: Cmd[] = [
   { id: 'n7', label: 'Deep Research', hint: '多智能体深度研究', group: '导航', href: '/research', icon: <Microscope size={15} />, keywords: 'research 研究 深度 报告 证据' },
   { id: 'n8', label: '数据与知识库', hint: '多模态接入与 RAG', group: '导航', href: '/data', icon: <Database size={15} />, keywords: 'rag 数据 知识库 上传 pdf' },
   { id: 'n9', label: '报告中心', hint: '可追溯诊断报告', group: '导航', href: '/report', icon: <FileText size={15} />, keywords: 'report 报告 导出 pdf' },
+  { id: 'n12', label: '系统自检', hint: '数据闭合 · 算法自洽 · 一键体检', group: '导航', href: '/health', icon: <ShieldCheck size={15} />, keywords: 'health selfcheck 自检 体检 断言 回归 质量' },
   { id: 'n10', label: '模型接入配置', hint: '网页直连大模型 API · 测试连通性', group: '导航', href: '/models', icon: <PlugZap size={15} />, keywords: 'model llm api key token 模型 密钥 魔搭 modelscope 接入 配置' },
   { id: 'n11', label: 'OCR 文档解析', hint: 'Xiaomi-OCR-0 · 图片转 RAG 语料', group: '导航', href: '/ocr', icon: <FileText size={15} />, keywords: 'ocr xiaomi 小米 图片 扫描件 文档 解析 kie vqa rag 语料 培养方案 jd' },
 ];

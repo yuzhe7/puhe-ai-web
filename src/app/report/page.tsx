@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FileText, Printer, Copy, Check, Sparkles, ShieldCheck, BookOpen, Download } from 'lucide-react';
 import { Card, SectionHeader, Badge, Loading, Empty } from '@/components/ui';
+import ExportButton from '@/components/ExportButton';
 import { majors, courses, demoStats } from '@/lib/dataset';
 import type { SimilarityCell, GapItem } from '@/lib/types';
 import type { CompetencyRow } from '@/lib/graph';
@@ -98,10 +99,11 @@ export default function ReportPage() {
             <SectionHeader title="交付动作" icon={<Download size={15} />} />
             <div className="space-y-2">
               <button onClick={() => window.print()} className="btn-primary w-full !text-xs"><Printer size={14} /> 打印 / 导出 PDF</button>
+              <ExportButton major={major} className="btn-ghost w-full !text-xs" label="导出课程矩阵 CSV（教务可导入）" />
               <button onClick={copy} className="btn-ghost w-full !text-xs">{copied ? <Check size={14} /> : <Copy size={14} />}{copied ? '已复制 Markdown' : '复制 Markdown'}</button>
               <a href={`/copilot?q=${encodeURIComponent(`请生成${major}面向${role}的三维诊断报告`)}`} className="btn-soft w-full !text-xs"><Sparkles size={14} /> 交给 AI 扩写</a>
             </div>
-            <p className="mt-3 text-[10.5px] leading-relaxed text-ink-400">打印时浏览器可直接「另存为 PDF」，对应赛道「技术文档 / 报告导出」要求。</p>
+            <p className="mt-3 text-[10.5px] leading-relaxed text-ink-400">CSV 含「课程 × 知识点 × 学时 × 缺口判定 × 对齐产业技能」，UTF-8 BOM 编码，Excel / WPS 直开、可导入教务系统；打印时浏览器可直接「另存为 PDF」。</p>
           </Card>
           <Card className="border-emerald-100 bg-emerald-50/40">
             <div className="flex items-start gap-2"><ShieldCheck size={15} className="mt-0.5 shrink-0 text-emerald-600" />

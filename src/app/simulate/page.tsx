@@ -7,6 +7,7 @@ import {
   TrendingUp, Layers3, Zap, FileText, ChevronRight, Check, Loader2, Info, Cpu,
 } from 'lucide-react';
 import { Card, SectionHeader, Badge, DeltaBar, Loading, MarkdownLite, ProgressBar } from '@/components/ui';
+import ExportButton from '@/components/ExportButton';
 import { compareRadarOption } from '@/lib/charts';
 import { autoMatchJob } from '@/lib/major-context';
 import type { SimPlan, SimResult, CourseRow } from '@/lib/simulator';
@@ -164,6 +165,14 @@ export default function SimulatePage() {
             <button onClick={() => plan && download(`puhe-reform-${major}.json`, JSON.stringify({ plan, result }, null, 2))} className="btn-ghost !text-xs" disabled={!plan}>
               <Download size={14} /> 导出方案
             </button>
+            <ExportButton
+              major={major}
+              job={job}
+              plan={plan ? { hours: plan.hours, modules: plan.modules, removed: plan.removed } : undefined}
+              label="导出改革后课程矩阵 CSV"
+              className="btn-ghost !text-xs"
+              block={false}
+            />
           </div>
         </div>
         <div className="relative z-10 mt-5 flex flex-wrap items-center gap-3 border-t border-ink-200/70 pt-4">
