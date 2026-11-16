@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   Search, CornerDownLeft, Sparkles, LayoutDashboard, Network, ScanSearch, Bot,
   Database, FileText, SlidersHorizontal, Route, Microscope, GraduationCap,
-  BookOpen, BriefcaseBusiness, ArrowUp, ArrowDown, X, Command, PlugZap, ShieldCheck,
+  BookOpen, BriefcaseBusiness, ArrowUp, ArrowDown, X, Command, PlugZap, ShieldCheck, FlaskConical,
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -28,6 +28,7 @@ const NAV_CMDS: Cmd[] = [
   { id: 'n8', label: '数据与知识库', hint: '多模态接入与 RAG', group: '导航', href: '/data', icon: <Database size={15} />, keywords: 'rag 数据 知识库 上传 pdf' },
   { id: 'n9', label: '报告中心', hint: '可追溯诊断报告', group: '导航', href: '/report', icon: <FileText size={15} />, keywords: 'report 报告 导出 pdf' },
   { id: 'n12', label: '系统自检', hint: '数据闭合 · 算法自洽 · 一键体检', group: '导航', href: '/health', icon: <ShieldCheck size={15} />, keywords: 'health selfcheck 自检 体检 断言 回归 质量' },
+  { id: 'n13', label: 'Agent 评测', hint: '28 条用例 · 零 token 可复跑', group: '导航', href: '/eval', icon: <FlaskConical size={15} />, keywords: 'eval 评测 指标 召回 溯源 基准 benchmark' },
   { id: 'n10', label: '模型接入配置', hint: '网页直连大模型 API · 测试连通性', group: '导航', href: '/models', icon: <PlugZap size={15} />, keywords: 'model llm api key token 模型 密钥 魔搭 modelscope 接入 配置' },
   { id: 'n11', label: 'OCR 文档解析', hint: 'Xiaomi-OCR-0 · 图片转 RAG 语料', group: '导航', href: '/ocr', icon: <FileText size={15} />, keywords: 'ocr xiaomi 小米 图片 扫描件 文档 解析 kie vqa rag 语料 培养方案 jd' },
 ];

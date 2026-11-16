@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Network, ScanSearch, Bot, Database, FileText,
   GraduationCap, ChevronRight, Sparkles, Menu, X, Cpu, CircleHelp, ExternalLink,
-  SlidersHorizontal, Route, Microscope, Search, Command, Activity, BookOpen, PlugZap, ShieldCheck,
+  SlidersHorizontal, Route, Microscope, Search, Command, Activity, BookOpen, PlugZap, ShieldCheck, FlaskConical,
 } from 'lucide-react';
 import clsx from 'clsx';
 import TechBackdrop from './TechBackdrop';
@@ -28,6 +28,7 @@ const NAV = [
   { href: '/data', label: '数据与知识库', icon: Database, desc: '多模态接入与 RAG' },
   { href: '/report', label: '报告中心', icon: FileText, desc: '可追溯诊断报告' },
   { href: '/health', label: '系统自检', icon: ShieldCheck, desc: '数据闭合 · 算法自洽 · 一键体检', tag: 'NEW' },
+  { href: '/eval', label: 'Agent 评测', icon: FlaskConical, desc: '28 条用例 · 零 token 可复跑', tag: 'NEW' },
 ];
 
 const TITLES: Record<string, { title: string; sub: string }> = {
@@ -44,6 +45,7 @@ const TITLES: Record<string, { title: string; sub: string }> = {
   '/data': { title: '数据与知识库', sub: '多模态文档接入 · 端侧向量检索 · 质量看板' },
   '/report': { title: '诊断报告中心', sub: '结构化结论 + 证据溯源 + 可导出交付' },
   '/health': { title: '系统自检', sub: '数据引用闭合 · 算法确定性 · 运行时保护，可现场重跑' },
+  '/eval': { title: 'Agent 评测', sub: '28 条固定用例 · 实体召回 / 数值可溯源 / 安全召回 / 自检漏报' },
 };
 
 interface Status {

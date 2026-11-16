@@ -20,6 +20,7 @@ import {
 import { checkRateLimit } from './validation';
 import { corpusStats, retrieve } from './rag';
 import { buildCourseMatrixCsv } from './export';
+import { EVAL_CASES } from './eval-cases';
 
 export interface CheckItem {
   id: string;
@@ -217,6 +218,18 @@ export function runSelfCheck(): SelfCheckReport {
     return {
       pass: rowOk && missing.length === 0,
       detail: `${out.rows} 行 · ${head.length} 列${missing.length ? ` · 缺列：${missing.join('、')}` : ''}${rowOk ? '' : ` · 行数不符（${lines.length - 1}）`}`,
+    };
+  });
+
+  run('eval-cases', '数据', '评测用例集结构完整（ID 唯一、五类覆盖）', () => {
+    const ids = new Set(EVAL_CASES.map((c) => c.id));
+    const dup = EVAL_CASES.length - ids.size;
+    const cats = new Set(EVAL_CASES.map((c) => c.category));
+    const safetyCases = EVAL_CASES.filter((c) => c.expectBlocked).length;
+    const ok = dup === 0 && cats.size === 5 && safetyCases >= 3;
+    return {
+      pass: ok,
+      detail: `${EVAL_CASES.length} 条 / 重复 ${dup} / ${cats.size} 类 / 安全用例 ${safetyCases} 条`,
     };
   });
 

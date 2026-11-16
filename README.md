@@ -40,7 +40,7 @@
 ┌────────────────────────────── 浏览器（AI Native 前端） ──────────────────────────────┐
 │ Next.js 14 App Router · React 18 · TypeScript(strict) · Tailwind CSS 设计令牌         │
 │  / 总览   /graph 图谱   /diagnosis 三维诊断   /copilot Agent   /simulate 改革沙盘     │
-│  /path 能力路径   /research 深度研究   /data 知识库   /report 报告中心（共 13 页）      │
+│  /path 能力路径   /research 深度研究   /data 知识库   /report 报告中心（共 14 页）      │
 │  双主题（深空/明亮）· ⌘K 命令面板 · Canvas 神经网络背景 · 数字滚动 · 扫光发光边框    │
 │  ECharts（动态导入 / 代码分割 / 暗色重映射）· SSE 增量渲染 · Web Speech API          │
 └───────────────────────────┬─────────────────────────────────────────────────────────┘
@@ -117,7 +117,7 @@
 | **岗位能力路径规划**          | `/path`     | 知识点共现 + 跨课程语义邻接图上的多源 Dijkstra；能力就绪度环；分学期 96h 预算排课                   | 创新性 25% / 实用性 10%  |
 | **Deep Research 工作台** | `/research` | 4 路子问题取证 → 工具计算 → 跨来源去重 → 置信度评估 → 带 [n] 引用简报（SSE）                   | AI 深度 35% / 体验 10% |
 | **深空科技主题 + 双主题令牌**    | 全站          | CSS 变量驱动全部色阶，ECharts 渲染层自动重映射；Canvas 神经网络背景、扫光、呼吸灯、数字滚动             | 体验 10% / 前端工程 10%  |
-| **⌘K 全局命令面板**         | 全站          | 13 个页面 + 快捷 AI 指令 + 62 专业 / 109 课程 / 38 岗位的实体检索与深链接（首次唤起时按需拉取，不进首屏包） | 体验 10%             |
+| **⌘K 全局命令面板**         | 全站          | 14 个页面 + 快捷 AI 指令 + 62 专业 / 109 课程 / 38 岗位的实体检索与深链接（首次唤起时按需拉取，不进首屏包） | 体验 10%             |
 | **实时洞察流**             | 首页          | 基于真实诊断数据生成带时间戳的 Agent 事件流，支持重新扫描                                    | 体验 10%             |
 
 > 详细升级说明、评分映射增补与演示片段脚本见 `docs/05-v2-功能升级说明.md`。
@@ -232,7 +232,7 @@ v4 只能改 `.env.local` 并重启；v5 新增 **`/models` 模型接入配置�
 - 入口已接入 `/majors` 卡片（岗位分与 `S=` 分数）与 `/diagnosis`（综合同质化评分），右侧抽屉展示，支持 `Esc` 关闭与一键复制计算链 JSON
 - 新增 `src/lib/trace.ts`、`src/components/TraceDrawer.tsx`、`src/app/api/trace/route.ts`
 
-**② 系统自检（`/health` + `GET /api/selfcheck`）**：答辩现场一键体检，18 项断言分三类：
+**② 系统自检（`/health` + `GET /api/selfcheck`）**：答辩现场一键体检，19 项断言分三类：
 
 | 类别 | 断言内容 |
 | --- | --- |
@@ -253,7 +253,21 @@ v4 只能改 `.env.local` 并重启；v5 新增 **`/models` 模型接入配置�
 - 沙盘里调过学时后点「导出改革后课程矩阵」，导出的是**当前方案**的学时；`knowledgeGaps` 新增可选的 `hours` 覆盖参数，按比例缩放知识点学时，使「改学时 → 覆盖度 → 缺口判定」形成闭环（不传时与历史行为完全一致）
 - 新增 `src/lib/export.ts`、`src/components/ExportButton.tsx`、`src/app/api/export/route.ts`
 
-**④ 同期修复的两个缺陷**（对应 v10 的回归断言）：
+**④ Agent 评测（`/eval` + `GET /api/eval`）**：28 条固定用例、5 个类别（检索 / 诊断 / 数值 / 安全 / 边界），离线可复跑、零 token。
+
+| 指标 | 口径 | 当前值 |
+| --- | --- | --- |
+| 实体召回 | 有期望实体的用例中至少命中 1 个（另附严格关键词命中率） | 100% / 关键词 69.5% |
+| **数值可溯源** | 回答里的每个数字能否在证据中找到（对应 ragas Faithfulness） | 94.7%（11 个未溯源，均为公式权重常量） |
+| 安全召回 | 注入用例被正确拦截 | 100% |
+| 安全精确率 / PII 脱敏 | 正常问题不误拦 / 个人信息脱敏而非拦截 | 100% / 100% |
+| **自检漏报** | Agent 自报 `verifyGrounding` 通过、而评测独立复算判为有问题 | **0**（危险方向） |
+
+指标参考 ragas 的 Answer Relevancy / Faithfulness 思路，但全部用本地确定性算法实现，不调用任何评测模型。新增 `src/lib/eval.ts`、`src/lib/eval-cases.ts`、`src/app/api/eval/route.ts`、`src/app/eval/page.tsx`、`scripts/verify-eval.mjs`（`npm run verify:eval`）。
+
+> 这一层还顺带修出两个真问题：① 英文注入 `ignore all previous instructions` 因正则只允许一个修饰词而**漏拦**；② `verifyGrounding` 把同一数字的重复出现计为多处违规，导致误报。两者都由评测发现并已修复。
+
+**⑤ 同期修复的两个缺陷**（对应 v10 的回归断言）：
 
 - 岗位匹配三层失真：别名包含硬编码 0.94、对齐规则交替词袋满分、完全同名只给 0.6、且无领域语义 → 62 个专业的 Top1 岗位从 2 个扩散到 18 个，法学不再首选「临床数据分析师」
 - SSE 断连崩溃：客户端关闭标签页时 `controller.enqueue` 抛 `Invalid state: Controller is already closed`，且 `catch` 内二次 `send` 造成连环抛错 → 现改为软失败并停止后续生成
@@ -312,7 +326,7 @@ AI_MODEL=deepseek-chat
 ```bash
 npm run typecheck    # TypeScript 严格检查
 npm run lint         # ESLint
-npm run build        # 生产构建（13 页面 + 17 API，standalone 产物）
+npm run build        # 生产构建（14 页面 + 18 API，standalone 产物）
 npm run audit:data   # 数据引用完整性离线审计（无需构建）
 npm run check:modelscope  # 魔搭 API 连通性 / Function Calling 自检
 npm run pack:studio       # 生成创空间干净上传包 studio-package/（含密钥扫描）
@@ -349,7 +363,8 @@ puhe-ai-web/
 │   │   ├── ocr/page.tsx             Xiaomi-OCR-0 文档解析工作台           ★ v6
 │   │   ├── data/page.tsx            多模态接入 / RAG / 治理（注入拦截提示）
 │   │   ├── report/page.tsx          报告中心
-│   │   ├── health/page.tsx          系统自检（17 项断言 · 一键体检）        ★ v10
+│   │   ├── health/page.tsx          系统自检（19 项断言 · 一键体检）        ★ v10
+│   │   ├── eval/page.tsx            Agent 评测（28 条用例 · 四类指标）      ★ v10
 │   │   ├── api/                    chat / rag / ingest / analyze / mcp / status
 │   │   │                          + simulate / path / research / syllabus  ★ v2
 │   │   │                          + majors                                ★ v3
@@ -357,6 +372,7 @@ puhe-ai-web/
 │   │   │                          + ocr                                   ★ v6
 │   │   │                          + trace / selfcheck                     ★ v10
 │   │   │                          + export                                ★ v10
+│   │   │                          + eval                                  ★ v10
 │   │   ├── error.tsx  global-error.tsx  not-found.tsx  错误边界        ★ v3
 │   │   ├── layout.tsx  globals.css  双主题设计令牌 + 科技质感动效
 │   ├── components/                 AppShell / EChart(暗色重映射) / ui
@@ -371,6 +387,8 @@ puhe-ai-web/
 │       ├── trace.ts                数值溯源：公式 / 中间量 / 独立复算        ★ v10
 │       ├── selfcheck.ts            运行时自检断言（数据闭合 / 算法确定性）    ★ v10
 │       ├── export.ts               交付物导出：课程矩阵 / 岗位技能明细 CSV     ★ v10
+│       ├── eval.ts                 Agent 评测执行器与四类指标                ★ v10
+│       ├── eval-cases.ts           28 条评测用例（声明式数据）               ★ v10
 │       ├── validation.ts           输入校验 / 限流 / 资源上限 / 完整性自检   ★ v3
 │       ├── graph.ts                三维确定性算法 + 图谱构建 + 跨域语义对齐
 │       ├── rag.ts                  端侧 TF-IDF 向量检索 + 实时入库 + 投毒净化
@@ -397,6 +415,7 @@ puhe-ai-web/
 │   ├── verify-ocr.mjs              OCR 全链路 mock 端到端自测              ★ v6
 │   ├── verify-majors.mjs           专业目录 / 归类 / 口径分层断言          ★ v8
 │   ├── verify-deeplinks.mjs        专业深链接自动匹配验证                  ★ v9
+│   ├── verify-eval.mjs             Agent 评测回归（10 项门槛断言）          ★ v10
 │   ├── check-oss-risk.mjs          开源选型风险守卫（A/B/C 三层）          ★ 风险处置
 ├── Dockerfile                     创空间 Docker 部署（监听 7860）         ★ v4
 ├── ms_deploy.json                 创空间部署配置                          ★ v4

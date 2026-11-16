@@ -16,6 +16,7 @@
     "verify:ocr": "node scripts/verify-ocr.mjs",
     "verify:majors": "node scripts/verify-majors.mjs",
     "verify:links": "node scripts/verify-deeplinks.mjs",
+    "verify:eval": "node scripts/verify-eval.mjs",
     "verify:oss": "node scripts/check-oss-risk.mjs"
   },
   "dependencies": {
