@@ -7,7 +7,11 @@
 
 const INJECTION_PATTERNS = [
   /忽略(以上|之前|前面|所有).{0,6}(指令|提示|规则|要求)/i,
-  /ignore (all |previous |above )?(instructions?|prompts?|rules?)/i,
+  // 英文注入：允许 all/previous/above/prior 等多个修饰词叠加
+  // （原先 `(all |previous |above )?` 只允许一个词，导致 "ignore all previous instructions" 漏拦）
+  /ignore\s+(?:all\s+|any\s+|the\s+)?(?:previous\s+|above\s+|prior\s+|earlier\s+|these\s+)*(?:instructions?|prompts?|rules?|directions?)/i,
+  // 套取系统提示词 / 密钥 / token
+  /(?:reveal|show|print|dump|leak|output|tell)\s+(?:me\s+)?(?:your|the)\s+(?:system\s*prompt|api[_\s-]?key|secret|token|instructions?)/i,
   /(你现在是|pretend you are|act as).{0,20}(系统管理员|developer mode|DAN)/i,
   /输出.{0,10}(系统提示词|system prompt|密钥|api.?key)/i,
   /<\|.*?\|>/,
@@ -40,7 +44,9 @@ export function guardInput(input: string): GuardResult {
 
 /** 输出数值溯源：答案里出现的百分数/小数，必须能在证据文本中找到 */
 export function verifyGrounding(answer: string, evidence: string): GuardResult {
-  const numbers = answer.match(/\b\d+(?:\.\d+)?%?\b/g) || [];
+  // 去重后再统计：同一个数字在回答里出现多次只应算一处证据缺口，
+  // 否则重复提及会虚增违规数（评测中曾因此把 3 处误判为 4 处而误报）
+  const numbers = Array.from(new Set(answer.match(/\b\d+(?:\.\d+)?%?\b/g) || []));
   const suspicious = numbers.filter((n) => n.length >= 2 && !evidence.includes(n) && !['AI', '12', 'PDCA'].includes(n));
   if (suspicious.length >= 4) {
     return { level: 'warn', text: `检测到 ${suspicious.length} 处未溯源数值，已追加证据提示`, cleaned: `${answer}\n\n> ⚠️ 部分数值未能与知识库证据直接匹配，请结合下方「证据溯源」卡片人工复核。` };
