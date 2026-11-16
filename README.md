@@ -40,7 +40,7 @@
 ┌────────────────────────────── 浏览器（AI Native 前端） ──────────────────────────────┐
 │ Next.js 14 App Router · React 18 · TypeScript(strict) · Tailwind CSS 设计令牌         │
 │  / 总览   /graph 图谱   /diagnosis 三维诊断   /copilot Agent   /simulate 改革沙盘     │
-│  /path 能力路径   /research 深度研究   /data 知识库   /report 报告中心（共 9 页）      │
+│  /path 能力路径   /research 深度研究   /data 知识库   /report 报告中心（共 13 页）      │
 │  双主题（深空/明亮）· ⌘K 命令面板 · Canvas 神经网络背景 · 数字滚动 · 扫光发光边框    │
 │  ECharts（动态导入 / 代码分割 / 暗色重映射）· SSE 增量渲染 · Web Speech API          │
 └───────────────────────────┬─────────────────────────────────────────────────────────┘
@@ -117,7 +117,7 @@
 | **岗位能力路径规划**          | `/path`     | 知识点共现 + 跨课程语义邻接图上的多源 Dijkstra；能力就绪度环；分学期 96h 预算排课                   | 创新性 25% / 实用性 10%  |
 | **Deep Research 工作台** | `/research` | 4 路子问题取证 → 工具计算 → 跨来源去重 → 置信度评估 → 带 [n] 引用简报（SSE）                   | AI 深度 35% / 体验 10% |
 | **深空科技主题 + 双主题令牌**    | 全站          | CSS 变量驱动全部色阶，ECharts 渲染层自动重映射；Canvas 神经网络背景、扫光、呼吸灯、数字滚动             | 体验 10% / 前端工程 10%  |
-| **⌘K 全局命令面板**         | 全站          | 12 个页面 + 快捷 AI 指令 + 62 专业 / 109 课程 / 38 岗位的实体检索与深链接（首次唤起时按需拉取，不进首屏包） | 体验 10%             |
+| **⌘K 全局命令面板**         | 全站          | 13 个页面 + 快捷 AI 指令 + 62 专业 / 109 课程 / 38 岗位的实体检索与深链接（首次唤起时按需拉取，不进首屏包） | 体验 10%             |
 | **实时洞察流**             | 首页          | 基于真实诊断数据生成带时间戳的 Agent 事件流，支持重新扫描                                    | 体验 10%             |
 
 > 详细升级说明、评分映射增补与演示片段脚本见 `docs/05-v2-功能升级说明.md`。
@@ -215,12 +215,48 @@ v4 只能改 `.env.local` 并重启；v5 新增 **`/models` 模型接入配置�
 
 修复「从专业目录卡片跳转到沙盘 / 诊断 / 路径后，目标岗位和对比专业仍是默认值」的问题：
 
-- 三个跳转链接自动携带该专业**契合度最高的岗位**（`crossSideMatch` 最高分）与**同质化最高的对比专业**（`similarityMatrix` 最高分）。例如「低空技术与工程」→ 目标岗位「智能建造工程师 0.59」、对比专业「时空信息工程 S=0.288」
+- 三个跳转链接自动携带该专业**契合度最高的岗位**（`crossSideMatch` 最高分）与**同质化最高的对比专业**（`similarityMatrix` 最高分）。例如「低空技术与工程」→ 目标岗位「时空数据工程师 0.43」、对比专业「时空信息工程 S=0.288」
 - 目标页读入参数即开始分析：沙盘 260ms 防抖重算五维指标、诊断 `useMemo` 刷新两两对比、路径自动重新规划学习路径；页面显示匹配依据与分数
 - 三条链路：目录页跳转（链接带全参数，零额外请求）、只带 `?major=` 的深链接（自动补齐）、页内切换专业（联动重匹配）；手动改岗位 / 对比专业时尊重用户选择，并有匹配序号防止过期响应覆盖
 - 新增 `src/lib/major-context.ts` 与 `scripts/verify-deeplinks.mjs`（`npm run verify:links`）；`/api/status` 注册 `deep-link-auto-match` / `context-aware-analysis`
 
 > 参数协议、匹配依据与自动触发机制见 **`docs/12-专业深链接自动匹配说明.md`**。
+
+### v10 升级：从「能看」到「可信 + 能交付」（2026-11-16）
+
+> 解决的问题不是「再加一个功能」，而是「评委凭什么相信这些数值」和「诊断完能不能真的落地」。全部为本地确定性实现，不新增任何外部依赖。
+
+**① 数值溯源（`GET /api/trace`）**：任一分数的「公式 → 中间量 → 结果」可点开逐层查看，并附一次**独立复算校验**（复算值 vs 正式接口值，不一致即显红）。
+
+- 三类溯源：岗位契合度（逐技能对齐表 → 加权求和 → 领域亲和度）、同质化评分（Jaccard / 知识点重叠 / 图拓扑三分量拆解，含交集与并集规模）、知识点缺口（需求强度合成与判定规则）
+- 入口已接入 `/majors` 卡片（岗位分与 `S=` 分数）与 `/diagnosis`（综合同质化评分），右侧抽屉展示，支持 `Esc` 关闭与一键复制计算链 JSON
+- 新增 `src/lib/trace.ts`、`src/components/TraceDrawer.tsx`、`src/app/api/trace/route.ts`
+
+**② 系统自检（`/health` + `GET /api/selfcheck`）**：答辩现场一键体检，18 项断言分三类：
+
+| 类别 | 断言内容 |
+| --- | --- |
+| 数据 | 规模与版本一致（62/109/334/38/84）、五张表引用正反向闭合、主键与名称无重复 |
+| 算法 | 矩阵规模 n(n+1)/2、两次计算逐项一致、自比 = 1、非有限值检查、同名对齐 = 1、**泛化别名不再虚高**、**领域闸门生效**、岗位匹配未集中、缺口判定合法 |
+| 运行时 | 限流窗口生效、RAG 可召回、**CSV 导出结构完整** |
+
+全部通过返回 200，存在失败项返回 503，可直接被验收脚本消费；页面逐项展示耗时与实测值，并诚实列出「岗位匹配薄弱」的专业（当前 58/62 达标）。
+
+**③ 交付物导出（`POST /api/export`）**：把诊断结论变成教务能直接导入的表格，两条导出线：
+
+| 导出 | 内容 | 入口 |
+| --- | --- | --- |
+| 课程-知识点矩阵 | 18 列：专业 / 课程 / 学分 / 现行学时 / **改革后学时** / 学时变化 / 知识点 / Bloom层次 / 产业需求强度 / 覆盖度 / 缺口判定 / 调整建议 / 对齐产业技能 | `/report`、`/simulate` |
+| 岗位技能对齐明细 | 11 列：岗位技能 / 类别 / 需求强度 / 最相近知识点 / 对齐度 / 加权贡献 / 知识点所在课程 | `?type=match` |
+
+- CSV + UTF-8 BOM，Excel / WPS 直开不乱码，可批量导入教务系统；文件名走 RFC 5987 中文编码
+- 沙盘里调过学时后点「导出改革后课程矩阵」，导出的是**当前方案**的学时；`knowledgeGaps` 新增可选的 `hours` 覆盖参数，按比例缩放知识点学时，使「改学时 → 覆盖度 → 缺口判定」形成闭环（不传时与历史行为完全一致）
+- 新增 `src/lib/export.ts`、`src/components/ExportButton.tsx`、`src/app/api/export/route.ts`
+
+**④ 同期修复的两个缺陷**（对应 v10 的回归断言）：
+
+- 岗位匹配三层失真：别名包含硬编码 0.94、对齐规则交替词袋满分、完全同名只给 0.6、且无领域语义 → 62 个专业的 Top1 岗位从 2 个扩散到 18 个，法学不再首选「临床数据分析师」
+- SSE 断连崩溃：客户端关闭标签页时 `controller.enqueue` 抛 `Invalid state: Controller is already closed`，且 `catch` 内二次 `send` 造成连环抛错 → 现改为软失败并停止后续生成
 
 ---
 
@@ -276,7 +312,7 @@ AI_MODEL=deepseek-chat
 ```bash
 npm run typecheck    # TypeScript 严格检查
 npm run lint         # ESLint
-npm run build        # 生产构建（11 页面 + 13 API，standalone 产物）
+npm run build        # 生产构建（13 页面 + 17 API，standalone 产物）
 npm run audit:data   # 数据引用完整性离线审计（无需构建）
 npm run check:modelscope  # 魔搭 API 连通性 / Function Calling 自检
 npm run pack:studio       # 生成创空间干净上传包 studio-package/（含密钥扫描）
@@ -313,20 +349,28 @@ puhe-ai-web/
 │   │   ├── ocr/page.tsx             Xiaomi-OCR-0 文档解析工作台           ★ v6
 │   │   ├── data/page.tsx            多模态接入 / RAG / 治理（注入拦截提示）
 │   │   ├── report/page.tsx          报告中心
+│   │   ├── health/page.tsx          系统自检（17 项断言 · 一键体检）        ★ v10
 │   │   ├── api/                    chat / rag / ingest / analyze / mcp / status
 │   │   │                          + simulate / path / research / syllabus  ★ v2
 │   │   │                          + majors                                ★ v3
 │   │   │                          + models / models/test                 ★ v5
 │   │   │                          + ocr                                   ★ v6
+│   │   │                          + trace / selfcheck                     ★ v10
+│   │   │                          + export                                ★ v10
 │   │   ├── error.tsx  global-error.tsx  not-found.tsx  错误边界        ★ v3
 │   │   ├── layout.tsx  globals.css  双主题设计令牌 + 科技质感动效
 │   ├── components/                 AppShell / EChart(暗色重映射) / ui
 │   │                              + TechBackdrop / ThemeToggle / CommandPalette  ★ v2
+│   │                              + TraceDrawer（数值溯源抽屉）                ★ v10
+│   │                              + ExportButton（CSV 交付物下载）              ★ v10
 │   └── lib/
 │       ├── dataset.ts              试点数据集（专业/课程/知识点/岗位/技能/能力/政策）
 │       ├── hot-majors.ts           50 个观察池专业 + 8 条来源 + 10 类分组 ★ v3 / v8
 │       ├── major-taxonomy.ts       学科大类自动归类 / 覆盖率 / 归类总结    ★ v7 / v8
 │       ├── major-context.ts        深链接上下文 / 岗位与对比专业自动匹配    ★ v9
+│       ├── trace.ts                数值溯源：公式 / 中间量 / 独立复算        ★ v10
+│       ├── selfcheck.ts            运行时自检断言（数据闭合 / 算法确定性）    ★ v10
+│       ├── export.ts               交付物导出：课程矩阵 / 岗位技能明细 CSV     ★ v10
 │       ├── validation.ts           输入校验 / 限流 / 资源上限 / 完整性自检   ★ v3
 │       ├── graph.ts                三维确定性算法 + 图谱构建 + 跨域语义对齐
 │       ├── rag.ts                  端侧 TF-IDF 向量检索 + 实时入库 + 投毒净化
