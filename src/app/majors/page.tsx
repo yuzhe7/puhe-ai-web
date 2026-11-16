@@ -10,6 +10,7 @@ import {
   AlertTriangle, ArrowRight, SlidersHorizontal, Route, ScanSearch, Sparkles, X, Filter,
 } from 'lucide-react';
 import { Card, SectionHeader, Badge, Loading, ProgressBar, Empty } from '@/components/ui';
+import { TraceButton } from '@/components/TraceDrawer';
 
 const EChart = dynamic(() => import('@/components/EChart'), { ssr: false, loading: () => <Loading /> });
 
@@ -428,13 +429,16 @@ export default function MajorsPage() {
                   {m.matchedJobs.length > 0 && (
                     <div className="mt-2.5 flex flex-wrap gap-1">
                       {m.matchedJobs.slice(0, 2).map((j) => (
-                        <span key={j.title} className="chip border-ink-200 bg-surface-2 text-[9.5px] text-ink-500">{j.title} <span className="mono-num text-brand-600">{j.score}</span></span>
+                        <TraceButton key={j.title} target={{ kind: 'match', a: m.name, b: j.title }} className="chip border-ink-200 bg-surface-2 text-[9.5px] text-ink-500">
+                          {j.title} <span className="mono-num text-brand-600">{j.score}</span>
+                        </TraceButton>
                       ))}
                     </div>
                   )}
                   {m.topRisk && (
                     <div className="mt-2 flex items-center gap-1.5 text-[9.5px] text-ink-400">
-                      <AlertTriangle size={10} className="text-amber-600" /> 同质化最高：{m.topRisk.other} <span className="mono-num text-amber-700">S={m.topRisk.score}</span>
+                      <AlertTriangle size={10} className="text-amber-600" /> 同质化最高：{m.topRisk.other}{' '}
+                      <TraceButton target={{ kind: 'similarity', a: m.name, b: m.topRisk.other }} className="mono-num text-amber-700">S={m.topRisk.score}</TraceButton>
                     </div>
                   )}
                   <div className="mt-3 flex flex-wrap gap-1.5 border-t border-ink-100 pt-3">

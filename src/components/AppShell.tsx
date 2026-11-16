@@ -6,12 +6,13 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Network, ScanSearch, Bot, Database, FileText,
   GraduationCap, ChevronRight, Sparkles, Menu, X, Cpu, CircleHelp, ExternalLink,
-  SlidersHorizontal, Route, Microscope, Search, Command, Activity, BookOpen, PlugZap,
+  SlidersHorizontal, Route, Microscope, Search, Command, Activity, BookOpen, PlugZap, ShieldCheck,
 } from 'lucide-react';
 import clsx from 'clsx';
 import TechBackdrop from './TechBackdrop';
 import ThemeToggle from './ThemeToggle';
 import CommandPalette from './CommandPalette';
+import TraceDrawer from './TraceDrawer';
 
 const NAV = [
   { href: '/', label: '总览驾驶舱', icon: LayoutDashboard, desc: '平台全景与核心指标' },
@@ -26,6 +27,7 @@ const NAV = [
   { href: '/research', label: 'Deep Research', icon: Microscope, desc: '多智能体深度研究', tag: 'NEW' },
   { href: '/data', label: '数据与知识库', icon: Database, desc: '多模态接入与 RAG' },
   { href: '/report', label: '报告中心', icon: FileText, desc: '可追溯诊断报告' },
+  { href: '/health', label: '系统自检', icon: ShieldCheck, desc: '数据闭合 · 算法自洽 · 一键体检', tag: 'NEW' },
 ];
 
 const TITLES: Record<string, { title: string; sub: string }> = {
@@ -41,6 +43,7 @@ const TITLES: Record<string, { title: string; sub: string }> = {
   '/research': { title: 'Deep Research 工作台', sub: '问题拆解 → 多路检索 → 交叉验证 → 带引用的研究简报' },
   '/data': { title: '数据与知识库', sub: '多模态文档接入 · 端侧向量检索 · 质量看板' },
   '/report': { title: '诊断报告中心', sub: '结构化结论 + 证据溯源 + 可导出交付' },
+  '/health': { title: '系统自检', sub: '数据引用闭合 · 算法确定性 · 运行时保护，可现场重跑' },
 };
 
 interface Status {
@@ -188,6 +191,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </div>
 
       <CommandPalette open={palette} onOpenChange={setPalette} />
+      <TraceDrawer />
 
       {help && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-ink-900/60 p-4 backdrop-blur-sm" onClick={() => setHelp(false)}>

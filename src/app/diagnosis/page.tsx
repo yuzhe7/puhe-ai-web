@@ -10,6 +10,7 @@ import { Card, SectionHeader, Badge, Segmented, Loading, Empty, ProgressBar } fr
 import { heatmapOption, radarOption, gapBarOption, sankeyOption } from '@/lib/charts';
 import { majors, courses, skills } from '@/lib/dataset';
 import { autoMatchCompare } from '@/lib/major-context';
+import { TraceButton } from '@/components/TraceDrawer';
 import type { SimilarityCell, GapItem } from '@/lib/types';
 import type { CompetencyRow } from '@/lib/graph';
 
@@ -143,7 +144,10 @@ export default function DiagnosisPage() {
                 <div className="mt-4 space-y-3">
                   <div className="rounded-xl bg-gradient-to-br from-brand-50 to-white p-4 text-center">
                     <div className="label">综合同质化评分</div>
-                    <div className="mt-1 text-[34px] font-bold leading-none text-brand-700">{pair.score}</div>
+                    <div className="mt-1 flex items-center justify-center gap-2">
+                      <span className="text-[34px] font-bold leading-none text-brand-700">{pair.score}</span>
+                      <TraceButton target={{ kind: 'similarity', a: majorA, b: majorB }} className="rounded-md border border-ink-200 px-1.5 py-1 text-[9.5px] text-ink-400"><span>溯源</span></TraceButton>
+                    </div>
                     <div className="mt-1.5 text-[11px] text-ink-500">{pair.score >= 0.6 ? '存在显著低水平重复建设风险' : '差异化程度可接受'}</div>
                   </div>
                   {[
