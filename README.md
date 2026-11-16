@@ -3,6 +3,8 @@
 > 第九届传智杯全国大学生数智创新与 AI 应用大赛 —— **AI WEB 网页开发挑战赛** 参赛作品  
 > 赛道主题：**「智启未来：AI 驱动的 Web 应用创新挑战」**  
 > 官方赛道页：<https://www.boxuegu.com/matchTrack/detail/?id=10037>
+>
+> **🌐 在线演示**：<https://yuzhe123456-puhe-edu-graph-v2.ms.show> · **代码仓库**：<https://github.com/yuzhe7/puhe-ai-web>
 
 ---
 
@@ -452,7 +454,7 @@ puhe-ai-web/
 - [ ] Git 提交历史：请团队按开发阶段分次提交，体现真实开发过程（v1 骨架 → AI 层 → 业务页 → v2 增强 → v3 目录与加固）
 - [ ] 演示视频：5-8 分钟 / MP4 / ≥1080p / 普通话 + 字幕 → 脚本见 `docs/04`，v2 增补见 `docs/05`，v3 补拍建议见 `docs/06`
 - [x] 技术文档：**已生成 `docs/谱合产教-技术文档.pdf`（26 页，≤30 页限制内）**，源稿见 `docs/02`，可编辑版 `docs/谱合产教-技术文档.docx`；v2 增补章节见 `docs/05`，v3 数据与漏洞章节见 `docs/06`，v10 见 `docs/02` 第十三章
-- [ ] 在线演示（加分）：`Dockerfile` / `ms_deploy.json` 与打包、验收脚本已备好，按 **`docs/08`** 逐步发布到魔搭创空间并在评审期间保持可用
+- [x] 在线演示（加分）：**已发布** <https://yuzhe123456-puhe-edu-graph-v2.ms.show>（魔搭创空间 · Docker，`verify:studio` 16/16 通过）；复现步骤见 **`docs/08`**
 
 ---
 
