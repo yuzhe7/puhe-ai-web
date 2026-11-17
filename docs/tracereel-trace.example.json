@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "source": {
+    "type": "agent-browser",
+    "agent": "muse",
+    "session": "main"
+  },
+  "viewport": {
+    "width": 1919,
+    "height": 992
+  },
+  "states": [
+    { "id": "s01-intro", "screenshot": "shots/s01-intro.png", "caption": "谱合产教 · 总览驾驶舱" },
+    { "id": "s02-overview", "screenshot": "shots/s02-overview.png", "caption": "62 专业 / 109 课程 / 334 知识点 / 38 岗位" },
+    { "id": "s03-diagnosis-macro", "screenshot": "shots/s03-diagnosis-macro.png", "caption": "宏观 · 62 专业同质化热力图" },
+    { "id": "s04-diagnosis-rank", "screenshot": "shots/s04-diagnosis-rank.png", "caption": "高风险专业对 TOP 8" },
+    { "id": "s05-diagnosis-meso", "screenshot": "shots/s05-diagnosis-meso.png", "caption": "中观 · 12 项毕业要求偏差" },
+    { "id": "s06-diagnosis-micro", "screenshot": "shots/s06-diagnosis-micro.png", "caption": "微观 · 知识点缺口判定" },
+    { "id": "s07-majors", "screenshot": "shots/s07-majors.png", "caption": "热门专业目录 · 62 个专业" },
+    { "id": "s08-trace-drawer", "screenshot": "shots/s08-trace-drawer.png", "caption": "数值溯源抽屉 · 公式与计算链路" },
+    { "id": "s09-trace-verify", "screenshot": "shots/s09-trace-verify.png", "caption": "独立复算校验 · 一致" },
+    { "id": "s10-health", "screenshot": "shots/s10-health.png", "caption": "系统自检 · 19 项断言全绿" },
+    { "id": "s11-eval", "screenshot": "shots/s11-eval.png", "caption": "Agent 评测 · 28 条用例四类指标" },
+    { "id": "s12-simulate", "screenshot": "shots/s12-simulate.png", "caption": "改革沙盘 · 一键寻优 47.8 → 77.5" },
+    { "id": "s13-path", "screenshot": "shots/s13-path.png", "caption": "岗位能力路径 · 分学期补强计划" },
+    { "id": "s14-report", "screenshot": "shots/s14-report.png", "caption": "报告中心 · 导出课程矩阵 CSV" },
+    { "id": "s15-outro", "screenshot": "shots/s15-outro.png", "caption": "在线演示：yuzhe123456-puhe-edu-graph-v2.ms.show" }
+  ],
+  "actions": [
+    { "kind": "click", "from": "s01-intro", "to": "s01-intro", "x": 120, "y": 100, "stateDelayMs": 400 },
+    { "kind": "click", "from": "s02-overview", "to": "s03-diagnosis-macro", "x": 120, "y": 380, "stateDelayMs": 2200 },
+    { "kind": "click", "from": "s04-diagnosis-rank", "to": "s05-diagnosis-meso", "x": 620, "y": 210, "stateDelayMs": 1800 },
+    { "kind": "click", "from": "s05-diagnosis-meso", "to": "s06-diagnosis-micro", "x": 780, "y": 210, "stateDelayMs": 1800 },
+    { "kind": "click", "from": "s06-diagnosis-micro", "to": "s07-majors", "x": 120, "y": 156, "stateDelayMs": 1800 },
+    { "kind": "click", "from": "s07-majors", "to": "s08-trace-drawer", "x": 560, "y": 640, "stateDelayMs": 1200 },
+    { "kind": "click", "from": "s09-trace-verify", "to": "s10-health", "x": 120, "y": 800, "stateDelayMs": 2000 },
+    { "kind": "click", "from": "s10-health", "to": "s11-eval", "x": 120, "y": 856, "stateDelayMs": 32000 },
+    { "kind": "click", "from": "s11-eval", "to": "s12-simulate", "x": 120, "y": 464, "stateDelayMs": 3200 },
+    { "kind": "click", "from": "s12-simulate", "to": "s13-path", "x": 120, "y": 520, "stateDelayMs": 1800 },
+    { "kind": "click", "from": "s13-path", "to": "s14-report", "x": 120, "y": 744, "stateDelayMs": 1800 },
+    { "kind": "click", "from": "s14-report", "to": "s15-outro", "x": 120, "y": 100, "stateDelayMs": 1500 }
+  ],
+  "narration": [
+    {
+      "state": "s01-intro",
+      "text": "高校每年都在调整专业和课程，但依据往往来自经验判断。这个专业是不是开得太多？课程是不是已经落后产业三年？学生毕业到底能不能对上岗位？我们做了一个能回答这三个问题的平台——谱合产教。",
+      "audio": "audio/narration/s01.mp3"
+    },
+    {
+      "state": "s02-overview",
+      "text": "首页是平台的驾驶舱。这里是我们覆盖的规模：62 个专业、109 门课程、334 个知识点、38 个岗位，背后是 28640 条岗位需求样本。右边这条实时洞察流，每一条都来自真实的诊断计算，不是写死的文案。",
+      "audio": "audio/narration/s02.mp3"
+    },
+    {
+      "state": "s03-diagnosis-macro",
+      "text": "诊断分三层递进。宏观看专业布局——这是 62 个专业两两之间的同质化热力图，颜色越深，说明两个专业越像。",
+      "audio": "audio/narration/s03.mp3"
+    },
+    {
+      "state": "s04-diagnosis-rank",
+      "text": "右边是高风险专业对：软件工程和计算机科学与技术，综合相似度 0.79，其中课程 Jaccard 0.73、知识点重叠 0.77。",
+      "audio": "audio/narration/s04.mp3"
+    },
+    {
+      "state": "s05-diagnosis-meso",
+      "text": "中观看培养目标——12 项工程教育认证毕业要求，把校内覆盖度和产业需求度放在一起比，红色就是培养不足的项。",
+      "audio": "audio/narration/s05.mp3"
+    },
+    {
+      "state": "s06-diagnosis-micro",
+      "text": "微观落到知识点——以《数据结构》为例，六个知识点逐个判定：应加强、保持、还是可精简，每条都带产业需求强度和具体建议。",
+      "audio": "audio/narration/s06.mp3"
+    },
+    {
+      "state": "s07-majors",
+      "text": "但最常被问的一个问题是：这些数字凭什么可信？所以我们给每一个分数都做了溯源。",
+      "audio": "audio/narration/s07.mp3"
+    },
+    {
+      "state": "s08-trace-drawer",
+      "text": "点这个岗位匹配度，右边滑出完整计算链：先取该专业覆盖的知识点，再对岗位的每项技能求最大语义对齐，按需求强度加权求和、归一化，最后乘以领域亲和度——这一层专门避免把非医学专业匹配到临床岗位。",
+      "audio": "audio/narration/s08.mp3"
+    },
+    {
+      "state": "s09-trace-verify",
+      "text": "最后是复算校验：页面值和我独立重跑的结果一致，绿色代表通过；任何一个数对不上，这里就会标红。",
+      "audio": "audio/narration/s09.mp3"
+    },
+    {
+      "state": "s10-health",
+      "text": "光有溯源还不够——数据本身有没有断链？算法会不会悄悄漂移？这是系统自检页，19 项断言分三类：数据类查五张表的引用正反向闭合与规模一致；算法类查相似度矩阵两次计算是否逐项一致、有没有非有限值，还有两个回归断言——泛化别名不再虚高、领域闸门确实生效；运行时类查限流、RAG 召回和导出结构。全部通过返回 200，有失败项就返回 503。",
+      "audio": "audio/narration/s10.mp3"
+    },
+    {
+      "state": "s11-eval",
+      "text": "工程上有自检，那 AI 本身的质量怎么证明？这里 28 条固定用例，分检索、诊断、数值、安全、边界五类，离线可跑、零 token。四个指标：实体召回、数值可溯源、安全召回，还有一项别的项目很少做——自检漏报，即 Agent 自己说通过、而独立复算发现有问题的次数，越接近 0 越好，现在是 0。",
+      "audio": "audio/narration/s11.mp3"
+    },
+    {
+      "state": "s12-simulate",
+      "text": "诊断完之后呢？我们把结论直接接到决策上。这是培养方案改革沙盘：调整课程学时、增删产业模块，五个维度立刻重算。点「一键寻优」，给定学时预算，算法按单位学时增益贪心搜索，岗位匹配度从 47.8 拉到 77.5，右边是前后五维雷达对比。",
+      "audio": "audio/narration/s12.mp3"
+    },
+    {
+      "state": "s13-path",
+      "text": "对学校是沙盘，对学生就是路径。选定目标岗位后，算法在知识点共现图和跨课程语义邻接图上跑多源 Dijkstra，找出最短的补强链，再按每学期 96 学时排课。",
+      "audio": "audio/narration/s13.mp3"
+    },
+    {
+      "state": "s14-report",
+      "text": "最后是交付。诊断完不只是出一份报告——更重要的是这个按钮：导出课程矩阵 CSV，18 列包含课程、知识点、现行学时、改革后学时、缺口判定和调整建议，Excel 直接打开，教务可以批量导入。",
+      "audio": "audio/narration/s14.mp3"
+    },
+    {
+      "state": "s15-outro",
+      "text": "技术底座上，我们把端和云分开了：向量化、检索、图算法、数值计算全部在本地确定性完成，云端只做语言组织。所以它零 token 能跑、断网能演示、结果可复现。谱合产教——让专业建设从经验判断，变成数据决策。",
+      "audio": "audio/narration/s15.mp3"
+    }
+  ],
+  "audio": {
+    "music": {
+      "file": "audio/music/background.m4a",
+      "volume": 0.1,
+      "loop": true,
+      "duckUnderNarration": true
+    },
+    "loudness": {
+      "targetLUFS": -16,
+      "maxTruePeakDbTP": -1.5
+    }
+  }
+}
