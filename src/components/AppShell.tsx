@@ -87,7 +87,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* 侧边栏 */}
       <aside className={clsx(
-        'fixed inset-y-0 left-0 z-40 flex w-[248px] flex-col border-r border-ink-200/70 bg-surface/95 backdrop-blur-xl transition-transform lg:translate-x-0',
+        'app-sidebar fixed inset-y-0 left-0 z-40 flex w-[248px] flex-col border-r border-ink-200/70 bg-surface/95 backdrop-blur-xl transition-transform lg:translate-x-0',
         open ? 'translate-x-0' : '-translate-x-full',
       )}>
         <div className="flex items-center gap-3 px-5 py-5">
@@ -146,11 +146,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {open && <div className="fixed inset-0 z-30 bg-ink-900/40 lg:hidden" onClick={() => setOpen(false)} />}
+      {open && <div className="app-overlay fixed inset-0 z-30 bg-ink-900/40 lg:hidden" onClick={() => setOpen(false)} />}
 
       {/* 主区 */}
-      <div className="relative z-10 flex min-w-0 flex-1 flex-col lg:pl-[248px]">
-        <header className="sticky top-0 z-20 border-b border-ink-200/70 bg-surface/85 backdrop-blur-xl">
+      <div className="app-main-offset relative z-10 flex min-w-0 flex-1 flex-col lg:pl-[248px]">
+        <header className="app-header sticky top-0 z-20 border-b border-ink-200/70 bg-surface/85 backdrop-blur-xl">
           <div className="flex h-[68px] items-center gap-3 px-4 sm:px-7">
             <button className="rounded-lg p-2 text-ink-500 hover:bg-ink-100 lg:hidden" onClick={() => setOpen(true)} aria-label="打开菜单"><Menu size={19} /></button>
             <div className="min-w-0 flex-1">
@@ -181,7 +181,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         <main className="min-w-0 flex-1 px-4 py-6 sm:px-7 sm:py-7">{children}</main>
 
-        <footer className="border-t border-ink-200/70 bg-surface/70 px-7 py-4 text-[11px] text-ink-400 backdrop-blur-md">
+        <footer className="app-footer border-t border-ink-200/70 bg-surface/70 px-7 py-4 text-[11px] text-ink-400 backdrop-blur-md">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="flex items-center gap-2"><Activity size={12} className="text-brand-600" /> 谱合产教 · 基于多层知识图谱的高校人才培养与产业需求精准分析平台（AI Native Web 版）</span>
             <span className="flex items-center gap-3">

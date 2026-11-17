@@ -108,7 +108,7 @@ export default function TechBackdrop() {
   }, []);
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+    <div aria-hidden className="app-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden">
       <div className="absolute inset-0 grid-fade opacity-90" />
       <div className="hero-glow absolute inset-0" />
       <div className="absolute -left-40 top-[18%] h-[420px] w-[420px] rounded-full blur-2xl animate-drift"

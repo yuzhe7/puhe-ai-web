@@ -232,6 +232,43 @@ body {
 }
 
 @media print {
-  [data-theme='dark'] { --bg: 255 255 255; --surface: 255 255 255; --surface-2: 255 255 255; --ink-800: 30 41 59; }
+  /* ---------- 打印：只输出报告正文，A4 版式 ---------- */
+  @page { size: A4 portrait; margin: 12mm 10mm 14mm; }
+
+  /* 强制浅色：深空主题打印会整页发黑。整套色板都要换，否则 brand-* 仍是深色 */
+  [data-theme='dark'] {
+    --ink-50: 247 248 251; --ink-100: 239 242 247; --ink-200: 227 232 240; --ink-300: 203 212 226;
+    --ink-400: 118 134 156; --ink-500: 88 102 122;
+    --ink-600: 71 85 105; --ink-700: 51 65 85; --ink-800: 30 41 59; --ink-900: 15 23 42;
+
+    --brand-50: 238 243 255; --brand-100: 220 230 255; --brand-200: 188 207 255; --brand-300: 142 174 255;
+    --brand-400: 89 131 251; --brand-500: 52 97 244; --brand-600: 35 70 227; --brand-700: 29 55 196;
+
+    --bg: 255 255 255; --surface: 255 255 255; --surface-2: 250 251 253; --surface-3: 244 247 252;
+    --border: 226 232 240;
+  }
+  html, body { background: #fff !important; }
+
+  /* 应用外壳一律不印：侧栏、顶栏、页脚、背景、遮罩 */
+  .app-sidebar, .app-header, .app-footer, .app-backdrop, .app-overlay { display: none !important; }
+
+  /* 主内容不再为侧栏让出 248px */
+  .app-main-offset { padding-left: 0 !important; }
+
+  /* 报告页：左侧配置栏整列隐藏，正文占满宽度 */
+  .report-grid { display: block !important; }
+  .report-side { display: none !important; }
+
+  /* 分页控制：卡片与表格行不要被腰断 */
+  .card { box-shadow: none !important; break-inside: avoid; page-break-inside: avoid; }
+  table, tr, pre, blockquote { break-inside: avoid; page-break-inside: avoid; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; }
+
+  /* 交互控件不印 */
+  button, select, .btn-primary, .btn-ghost, .btn-soft { display: none !important; }
+
+  /* 保留品牌色与图表配色 */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
   .no-print { display: none !important; }
 }

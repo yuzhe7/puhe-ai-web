@@ -75,9 +75,9 @@ export default function ReportPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-5">
-      <div className="grid gap-4 xl:grid-cols-[300px_1fr]">
+      <div className="report-grid grid gap-4 xl:grid-cols-[300px_1fr]">
         {/* 配置侧栏 */}
-        <div className="space-y-4">
+        <div className="report-side space-y-4">
           <Card>
             <SectionHeader title="报告配置" icon={<FileText size={15} />} />
             <div className="space-y-3">
