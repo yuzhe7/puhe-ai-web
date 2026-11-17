@@ -21,7 +21,9 @@ const nextConfig = {
     const base = [
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-      { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+      // 反点击劫持：不用 X-Frame-Options（它只能 all-or-nothing，会连带挡住魔搭创空间页的 iframe 嵌入），
+      // 改用 CSP frame-ancestors 精确放行：自身 + 魔搭创空间页面。其余来源一律禁止嵌入。
+      { key: 'Content-Security-Policy', value: "frame-ancestors 'self' https://www.modelscope.cn https://modelscope.cn" },
       { key: 'Permissions-Policy', value: 'camera=(), microphone=(self), geolocation=(), payment=()' },
     ];
     return [

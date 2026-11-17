@@ -137,7 +137,7 @@
 | **RAG 投毒防护** | 入库按句检测并丢弃间接提示词注入内容，检索输出二次净化；`/data` 页展示「已拦截 N 段可疑指令」                                          |
 | 信息泄漏         | 统一 `serverError()` 泛化 500 + 服务端脱敏日志；SSE 错误事件不再回传上游异常原文                                        |
 | 可靠性          | 错误边界 / 404 / 图表加载兜底、数据引用完整性自检（离线 `scripts/audit-data.cjs` + 运行时 `/api/status.integrity`）、缓存上限 |
-| 响应头          | `nosniff` / `Referrer-Policy` / `X-Frame-Options` / `Permissions-Policy` / API `no-store`     |
+| 响应头          | `nosniff` / `Referrer-Policy` / CSP `frame-ancestors` / `Permissions-Policy` / API `no-store`     |
 | 性能           | 命令面板数据集按需加载，专业扩容 4.5 倍后首屏共享 JS 仍为 **87.3 kB**                                                 |
 
 > 演示数据与真实统计的边界、10 项残余风险与竞赛合规提醒，请务必阅读 `docs/06-专业目录扩展与漏洞分析报告.md`。
